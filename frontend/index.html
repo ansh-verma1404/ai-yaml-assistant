@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI YAML Assistant</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a2e);
+            color: #00ffcc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 30px;
+            text-shadow: 0 0 10px #00ffcc;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            background: #111;
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            padding: 15px;
+            font-size: 14px;
+            resize: none;
+            box-shadow: 0 0 15px #00ffcc33;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px;
+            background: #00ffcc;
+            border: none;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+
+        button:hover {
+            background: #00ffaa;
+            transform: scale(1.05);
+        }
+
+        pre {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #00ffcc;
+            box-shadow: 0 0 15px #00ffcc33;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .loader {
+            display: none;
+            margin-top: 10px;
+            color: #00ffaa;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🚀 AI YAML Assistant</h1>
+
+<div class="container">
+
+    <div class="panel">
+        <h3>🧾 Input YAML</h3>
+        <textarea id="yaml">
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+        </textarea>
+
+        <button onclick="analyze()">Analyze YAML</button>
+        <div class="loader" id="loader">Analyzing with AI...</div>
+    </div>
+
+    <div class="panel">
+        <h3>🤖 AI Output</h3>
+        <pre id="result">Waiting for analysis...</pre>
+    </div>
+
+</div>
+
+<div class="footer">
+    AI-powered Kubernetes YAML Analyzer • Built with FastAPI + LLM
+</div>
+
+<script>
+async function analyze() {
+    let yaml = document.getElementById("yaml").value;
+    let resultBox = document.getElementById("result");
+    let loader = document.getElementById("loader");
+
+    loader.style.display = "block";
+    resultBox.innerText = "";
+
+    try {
+        let res = await fetch("http://127.0.0.1:8000/analyze", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ yaml_text: yaml })
+        });
+
+        let data = await res.json();
+
+        loader.style.display = "none";
+        resultBox.innerText = data.analysis;
+
+    } catch (err) {
+        loader.style.display = "none";
+        resultBox.innerText = "Error connecting to backend.";
+    }
+}
+</script>
+
+</body>
+</html>
